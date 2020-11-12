@@ -3,7 +3,7 @@ import json
 import requests
 
 from typing import List, Dict
-from loguru import logger # best fucking log lib
+from loguru import logger
 from fake_useragent import UserAgent
 
 valid_search_type = ['documentary',
@@ -93,6 +93,3 @@ class netflix:
 
     def json_pretty(self, json_struct):
         return(json.dumps(json_struct,indent=4))
-
-    def status(self):
-        return self.get_json().status_code()
