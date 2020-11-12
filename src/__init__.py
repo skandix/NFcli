@@ -37,10 +37,10 @@ class netflix:
 
                 if 'movie' in nf_type and type(season) != int and category == "movie":
                     yield(self.struct_data(netflix))
-                    
+
                 elif 'documentary' in nf_type and category == "documentary":
                     yield(self.struct_data(netflix))
-                    
+
 
     def get_netflix_metadata(self,nf_id:str):
         graphql_query = '{"operationName":"getOriginalHook","variables":{"country":"","locale":"en","isAuthenticated":false,"withDocuments":true,"movieId":"{NF_ID}"},"query":"query getOriginalHook($movieId: String!, $locale: String!, $country: String, $isAuthenticated: Boolean!, $withDocuments: Boolean!) {\\n original(movieId: $movieId, locale: $locale) {\\n id\\n status\\n title\\n description\\n category\\n selectedSeason\\n keyArt {\\n medium\\n __typename\\n }\\n image(size: LARGE, locale: $locale, country: $country) {\\n id\\n url\\n type\\n __typename\\n }\\n releasingInDetectedCountry\\n isOriginalInDetectedCountry\\n releasingInCoverageCountry\\n isOriginalInCoverageCountry\\n publicityContacts {\\n id\\n name\\n email\\n __typename\\n }\\n documents @include(if: $withDocuments) {\\n id\\n name\\n category\\n url\\n __typename\\n }\\n __typename\\n }\\n assetSearch(movieId: $movieId, locale: $locale, categories: []) @include(if: $isAuthenticated) {\\n totalCount\\n __typename\\n }\\n}\\n"}'.replace("{NF_ID}", nf_id)
@@ -56,7 +56,7 @@ class netflix:
         season = data['seasons']
         uri = data['uri']
 
-        meta = dict(dict(n.get_netflix_metadata(_id)).items())
+        meta = dict(dict(self.get_netflix_metadata(_id)).items())
         meta_image = meta['original']['image']['url']
         meta_desc = meta['original']['description']
         meta_desc = (re.sub(u'<[^>]*>',"",str(meta_desc)))
@@ -71,7 +71,7 @@ class netflix:
             'name': name,
             'description':meta_desc,
             'category':("No Category Found" if meta_cat == None else meta_cat),
-            'locale': locale, 
+            'locale': locale,
             'seasons':season,
             'type':meta_typename,
             'img': (placeholder_img if meta_image == None else meta_image),
@@ -83,7 +83,7 @@ class netflix:
             'name': name,
             'description':meta_desc,
             'category':("No Category Found" if meta_cat == None else meta_cat),
-            'locale': locale, 
+            'locale': locale,
             'type':meta_typename,
             'img': (placeholder_img if meta_image == None else meta_image),
             'original_url': f'https://media.netflix.com{uri}'
